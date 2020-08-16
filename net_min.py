@@ -1,8 +1,27 @@
 import sys
 import ipaddress
+import socket
+
+
+def is_valid_ipv4(address):
+    try:
+        socket.inet_pton(socket.AF_INET, address)
+    except AttributeError:
+        try:
+            socket.inet_aton(address)
+        except socket.error:
+            return False
+        return address.count('.') == 3
+    except socket.error:  # not a valid address
+        return False
+
+    return True
 
 
 def min_network(ip_addrs):
+    for address in ip_addrs:
+        if is_valid_ipv4(address) is False:
+            raise ValueError('List contains invalid IP address')
     ip_addrs_iter = iter(ip_addrs)
     try:
         network_one = ipaddress.IPv4Network(ip_addrs_iter.__next__())
